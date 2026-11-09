@@ -1,0 +1,24 @@
+name: XiaoZhi Redis
+version: "0.1.0"
+slug: xiaozhi_redis
+description: Dedicated Redis for XiaoZhi on Home Assistant OS
+url: https://github.com/Yunlliang/xiaozhi-ha-addons
+arch:
+  - amd64
+  - aarch64
+startup: services
+boot: auto
+init: false
+options:
+  password: "CHANGE_ME_BEFORE_START"
+  maxmemory: "256mb"
+schema:
+  password: password
+  maxmemory: str
+ports:
+  6379/tcp:
+ports_description:
+  6379/tcp: "Redis (leave unexposed unless needed)"
+map:
+  - type: addon_config
+    read_only: false
