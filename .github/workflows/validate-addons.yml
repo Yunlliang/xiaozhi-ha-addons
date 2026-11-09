@@ -1,0 +1,45 @@
+name: Validate and build HA add-ons
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'redis/**'
+      - 'xiaozhi-server/**'
+      - 'xiaozhi-console/**'
+      - 'sherpa-onnx/**'
+      - '.github/workflows/validate-addons.yml'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate manifests and shell scripts
+        run: |
+          python -m pip install --quiet pyyaml
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          for name in ('redis', 'xiaozhi-server', 'xiaozhi-console', 'sherpa-onnx'):
+              d = Path(name)
+              c = yaml.safe_load((d / 'config.yaml').read_text())
+              assert all(k in c for k in ('name', 'version', 'slug', 'arch'))
+              assert (d / 'Dockerfile').exists() or 'image' in c
+              print(name, c['version'], c['slug'])
+          PY
+          for f in redis/run.sh xiaozhi-server/run.sh xiaozhi-console/run.sh; do sh -n "$f"; done
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: [redis, xiaozhi-server, xiaozhi-console]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build container image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.addon }}
+          push: false
+          tags: local/${{ matrix.addon }}:ci
