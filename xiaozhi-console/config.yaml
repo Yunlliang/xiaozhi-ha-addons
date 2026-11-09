@@ -7,7 +7,7 @@ arch:
   - amd64
 startup: application
 boot: manual
-init: false
+init: true
 options:
   database_host: "core-mariadb"
   database_port: 3306
