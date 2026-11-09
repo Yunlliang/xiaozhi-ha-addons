@@ -8,6 +8,7 @@ on:
       - 'xiaozhi-console/**'
       - 'sherpa-onnx/**'
       - '.github/workflows/validate-addons.yml'
+      - 'tests/**'
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -27,6 +28,7 @@ jobs:
               print(name, c['version'], c['slug'])
           PY
           for f in redis/run.sh xiaozhi-server/run.sh xiaozhi-console/run.sh; do sh -n "$f"; done
+          python -m unittest discover -s tests -v
   build:
     needs: validate
     runs-on: ubuntu-latest
