@@ -1,5 +1,5 @@
 name: XiaoZhi Console
-version: "0.1.0"
+version: "0.1.1"
 slug: xiaozhi_console
 description: XiaoZhi management API and Web console (full upstream image)
 url: https://github.com/Yunlliang/xiaozhi-ha-addons
@@ -9,12 +9,12 @@ startup: application
 boot: manual
 init: true
 options:
-  database_host: "core-mariadb"
+  database_host: "bd45c431-xiaozhi-mysql"
   database_port: 3306
   database_name: "xiaozhi_esp32_server"
   database_user: "xiaozhi"
   database_password: ""
-  redis_host: ""
+  redis_host: "bd45c431-xiaozhi-redis"
   redis_port: 6379
   redis_password: ""
 schema:
