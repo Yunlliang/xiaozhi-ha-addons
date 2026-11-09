@@ -30,4 +30,23 @@ export SPRING_DATASOURCE_DRUID_PASSWORD="$DB_PASSWORD"
 export SPRING_DATA_REDIS_HOST="$REDIS_HOST"
 export SPRING_DATA_REDIS_PORT="$REDIS_PORT"
 export SPRING_DATA_REDIS_PASSWORD="$REDIS_PASSWORD"
-exec /start.sh
+# Spring Boot reads SPRING_* environment variables directly. Unlike the upstream
+# start.sh, this avoids placing database/Redis passwords in Java process args.
+export SERVER_PORT=8003
+java -jar /app/xiaozhi-esp32-api.jar &
+JAVA_PID=$!
+cleanup() {
+  kill -TERM "$JAVA_PID" 2>/dev/null || true
+  wait "$JAVA_PID" 2>/dev/null || true
+}
+trap cleanup EXIT
+trap 'exit 143' TERM INT
+nginx -g 'daemon off;' &
+NGINX_PID=$!
+# Exit when either child exits, and stop the other service.
+while kill -0 "$JAVA_PID" 2>/dev/null && kill -0 "$NGINX_PID" 2>/dev/null; do
+  sleep 2
+done
+kill -TERM "$NGINX_PID" 2>/dev/null || true
+wait "$NGINX_PID" 2>/dev/null || true
+exit 1
