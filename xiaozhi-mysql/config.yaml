@@ -1,0 +1,24 @@
+name: XiaoZhi MySQL
+version: "0.1.0"
+slug: xiaozhi_mysql
+description: Dedicated MySQL 8.0 database for XiaoZhi Console
+url: https://github.com/Yunlliang/xiaozhi-ha-addons
+arch:
+  - amd64
+startup: services
+boot: auto
+init: true
+options:
+  root_password: ""
+  database_name: "xiaozhi_esp32_server"
+  database_user: "xiaozhi"
+  database_password: ""
+schema:
+  root_password: password
+  database_name: str
+  database_user: str
+  database_password: password
+ports:
+  3306/tcp:
+ports_description:
+  3306/tcp: "MySQL (keep unexposed to host)"
