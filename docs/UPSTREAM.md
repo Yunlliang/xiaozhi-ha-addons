@@ -26,6 +26,14 @@
 2. HAOS x86_64 构建通过，配置文件和持久化目录正确。
 3. 检查 8000、8002、8003、10400、10500 端口占用。
 4. 验证 Server 与 Console、MariaDB、Redis 的通信。
-5. 小智使用云端 Qwen，STT/TTS 优先调用现有 Sherpa 10500 API。
+5. 小智使用NVIDIA 云端 Nemotron 3.5 Lightning 30B A3B，STT/TTS 优先调用现有 Sherpa 10500 API。
 6. 不替换运行中的 Sherpa、MariaDB、Asterisk；Redis 作为新加载项部署；R1 SIP 保持不变。
 7. 验证管理后台鉴权、备份恢复及重启行为后才发布安装说明。
+
+## LLM 目标配置（待实现与验证）
+
+- 提供方：NVIDIA API（OpenAI 兼容）
+- Base URL：`https://integrate.api.nvidia.com/v1`
+- 模型 ID：`nvidia/nemotron-3.5-lightning-30b-a3b`
+- 密钥：由 HA 加载项安全配置注入，**禁止提交 API Key 到 GitHub**
+- 需验证小智 Server 的 LLM 提供方配置及流式响应、工具调用兼容性；此处只是目标配置，尚未接入。
