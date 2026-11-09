@@ -1,0 +1,27 @@
+name: XiaoZhi Server
+version: "0.1.0"
+slug: xiaozhi_server
+description: XiaoZhi voice WebSocket and OTA server (upstream image, HAOS wrapper)
+url: https://github.com/Yunlliang/xiaozhi-ha-addons
+arch:
+  - amd64
+startup: application
+boot: manual
+init: false
+options:
+  manager_url: "http://192.168.1.3:8002/xiaozhi"
+  manager_secret: ""
+  vision_explain_url: "http://192.168.1.3:8003/mcp/vision/explain"
+schema:
+  manager_url: url
+  manager_secret: password
+  vision_explain_url: url
+ports:
+  8000/tcp: 8000
+  8003/tcp: 8003
+ports_description:
+  8000/tcp: XiaoZhi WebSocket
+  8003/tcp: XiaoZhi HTTP/OTA
+map:
+  - type: addon_config
+    read_only: false
