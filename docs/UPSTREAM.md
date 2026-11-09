@@ -14,7 +14,7 @@
 
 ## Redis
 
-当前 HAOS 已安装的 Redis 加载项上游未确认。先核对实际 slug、镜像和版本，再选择来源；不要冒用现有加载项的身份。
+用户已确认 HAOS 尚未安装 Redis。计划新建独立 Redis 加载项，先核对官方 Redis 镜像及许可、持久化、密码、内部网络与端口暴露策略；不使用现有加载项身份。
 
 ## MariaDB
 
@@ -27,5 +27,5 @@
 3. 检查 8000、8002、8003、10400、10500 端口占用。
 4. 验证 Server 与 Console、MariaDB、Redis 的通信。
 5. 小智使用云端 Qwen，STT/TTS 优先调用现有 Sherpa 10500 API。
-6. 不替换运行中的 Sherpa、Redis、MariaDB、Asterisk；R1 SIP 保持不变。
+6. 不替换运行中的 Sherpa、MariaDB、Asterisk；Redis 作为新加载项部署；R1 SIP 保持不变。
 7. 验证管理后台鉴权、备份恢复及重启行为后才发布安装说明。
