@@ -8,7 +8,7 @@ arch:
   - aarch64
 startup: services
 boot: auto
-init: false
+init: true
 options:
   password: "CHANGE_ME_BEFORE_START"
   maxmemory: "256mb"
