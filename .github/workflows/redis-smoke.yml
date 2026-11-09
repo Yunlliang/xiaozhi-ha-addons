@@ -1,0 +1,35 @@
+name: Redis smoke test
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'redis/**'
+      - '.github/workflows/redis-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  redis-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Redis HA add-on
+        run: docker build -t xiaozhi-redis:test redis
+      - name: Start and authenticate to Redis
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p test-data
+          chmod 777 test-data
+          printf '{"password":"CI-test-unique-secret-123","maxmemory":"64mb"}' > test-data/options.json
+          docker run -d --name xiaozhi-redis-ci -v "$PWD/test-data:/data" xiaozhi-redis:test
+          ready=0
+          for i in $(seq 1 30); do
+            if docker exec -e REDISCLI_AUTH=CI-test-unique-secret-123 xiaozhi-redis-ci redis-cli ping | grep -qx PONG; then ready=1; break; fi
+            sleep 1
+          done
+          test "$ready" -eq 1
+          docker exec xiaozhi-redis-ci sh -c 'test -f /data/redis/redis.conf && test -f /data/redis/appendonlydir/appendonly.aof.manifest'
+          docker logs xiaozhi-redis-ci
+      - name: Clean up
+        if: always()
+        run: docker rm -f xiaozhi-redis-ci || true
