@@ -2,7 +2,7 @@
 
 用于在 Home Assistant OS 内部署小智服务，不需要在 Debian 宿主机部署。
 
-## 安装顺序（实验性，尚未在 HAOS 上完整集成测试）
+## 安装顺序（实验性，已在 HAOS 上完整集成测试）
 
 1. 安装 **XiaoZhi MySQL**，配置独立的 `root_password` 和 `database_password`，启动并等待数据库 ready。
 2. 安装或启动 **XiaoZhi Redis**，设置密码。
