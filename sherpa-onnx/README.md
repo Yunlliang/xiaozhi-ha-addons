@@ -1,6 +1,6 @@
 # XiaoZhi Sherpa-ONNX TTS/STT
 
-This add-on reuses the **upstream published image**, rather than reimplementing speech recognition and synthesis. Upstream: https://github.com/ptbsare/sherpa-onnx-tts-stt, upstream image (add-on manifest version 0.3.8; image version is controlled by upstream).
+This add-on reuses the **upstream published image**, rather than reimplementing speech recognition and synthesis. Upstream: https://github.com/ptbsare/sherpa-onnx-tts-stt, upstream image (add-on manifest version 0.3.9; image version is controlled by upstream).
 
 This is an optional **second instance** with a different HA slug. It is **not required** if your existing Sherpa add-on works. Ports 10400 and 10500 are intentionally not published on the HA host by default to avoid collisions; assign different host ports if installing a second instance.
 
@@ -10,9 +10,9 @@ Not yet verified on your HAOS installation.
 
 ## SenseVoice Small INT8 (experimental STT)
 
-The add-on configuration now exposes `sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17` as an STT model choice. **This is NOT a one-click model integration**: the upstream image has no verified built-in Python loader for this name. Selecting it alone may fail startup. Keep the working Paraformer configuration until the custom loader has been tested.
+**SenseVoice is not currently a built-in dropdown option.** The upstream image has no built-in Python loader for this model. A previously exposed dropdown was removed in manifest version 0.3.9 to prevent a startup failure. Keep the working Paraformer configuration until a custom image with the loader has been built and tested.
 
-For an isolated test instance, set the STT model to that exact name and configure `custom_stt_model_eval` as follows:
+For reference only, the proposed upstream custom-model expression is below. **Do not paste this into the production HA add-on**: the current HA schema does not accept this model name, and the image compatibility and downloaded file layout have not been verified.
 
 ```yaml
 stt_model: sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17
