@@ -1,36 +1,33 @@
 # XiaoZhi Sherpa-ONNX TTS/STT
 
-This add-on reuses the **upstream published image**, rather than reimplementing speech recognition and synthesis. Upstream: https://github.com/ptbsare/sherpa-onnx-tts-stt, upstream image (add-on manifest version 0.3.9; image version is controlled by upstream).
+Version **0.4.0**. This add-on builds a **thin local derivative** of the upstream published image, adding one SenseVoice Small INT8 Python loader. The Wyoming and OpenAI-compatible API servers remain upstream code.
 
-This is an optional **second instance** with a different HA slug. It is **not required** if your existing Sherpa add-on works. Ports 10400 and 10500 are intentionally not published on the HA host by default to avoid collisions; assign different host ports if installing a second instance.
+Upstream: https://github.com/ptbsare/sherpa-onnx-tts-stt
 
-OpenAI-compatible API (inside the container): `/v1/audio/transcriptions`, `/v1/audio/speech`. Wyoming TCP 10400. Source and license belong to the upstream author; this repository does not claim ownership of the binary image.
+## What changed
 
-Not yet verified on your HAOS installation.
+- `Dockerfile` extends the upstream 0.3.7 CPU image via `build.yaml` (amd64/aarch64), copying a new loader into `/app/models/stt/`.
+- The STT selector offers the two original Paraformer models and `sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17`.
+- The SenseVoice loader downloads the official sherpa-onnx model on first start, then constructs `OfflineRecognizer.from_sense_voice` using `model.int8.onnx` and `tokens.txt`.
+- Existing TTS choices and API endpoints are unchanged.
 
-## SenseVoice Small INT8 (experimental STT)
+**Status: source integrated, not yet build-tested or validated on HAOS.** An upstream image tag, model archive layout, or sherpa-onnx API mismatch can cause the new model to fail. Do not switch the only working STT instance until a second instance has passed a test.
 
-**SenseVoice is not currently a built-in dropdown option.** The upstream image has no built-in Python loader for this model. A previously exposed dropdown was removed in manifest version 0.3.9 to prevent a startup failure. Keep the working Paraformer configuration until a custom image with the loader has been built and tested.
+## Safe installation/test
 
-For reference only, the proposed upstream custom-model expression is below. **Do not paste this into the production HA add-on**: the current HA schema does not accept this model name, and the image compatibility and downloaded file layout have not been verified.
+1. Keep the existing Sherpa-ONNX add-on running. This repository uses a different slug (`xiaozhi_sherpa_onnx`) for a separate test instance.
+2. Refresh this GitHub repository in the HA add-on store, then inspect the **0.4.0** add-on. A local build may take longer than pulling a published image.
+3. Leave host port mappings for 10400 and 10500 **empty** until you have checked for collisions. For a separate externally accessible test, assign unused host ports.
+4. Start with Paraformer Small INT8 and verify startup/logs, then select SenseVoice Small INT8 and restart **only this test add-on**.
+5. Inspect logs for download errors, missing files, API errors, and successful startup on 10400/10500. Test a short Chinese WAV against `/v1/audio/transcriptions` through the chosen host mapping.
+6. Compare recognition text, response latency and CPU use using identical recordings. Confirm XiaoZhi Server actually calls the tested STT endpoint before attributing improvements to the model.
 
-```yaml
-stt_model: sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17
-stt_use_online_processing: false
-custom_stt_model_eval: >-
-  sherpa_onnx.OfflineRecognizer.from_sense_voice(
-    model="/stt-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17/model.int8.onnx",
-    tokens="/stt-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17/tokens.txt",
-    num_threads=3,
-    provider="cpu",
-    language="zh",
-    use_itn=True,
-    debug=False
-  )
-```
+## Rollback
 
-This custom expression is executed by upstream Python `eval()`. Only use reviewed, trusted expressions. Model download, compatibility with the pinned upstream image, and the HA add-on options-to-environment mapping **remain unverified**; do not apply to the production instance without testing.
+Switch `stt_model` back to `sherpa-onnx-paraformer-zh-small-2024-03-09`, save and restart only this add-on. The original separate Sherpa add-on is untouched.
 
-Rollback: restore the original `stt_model` and remove `custom_stt_model_eval` (or set it to the upstream-supported `null` string), then restart only this add-on. No TTS, LLM, database, or other add-on settings need to change.
+The model is offline/utterance-based; `stt_use_online_processing` should remain `false`. Enabling it does not make SenseVoice streaming.
 
-Official model: https://k2-fsa.github.io/sherpa/onnx/sense-voice/pretrained.html
+The optional custom expression fields are upstream advanced features and may execute Python code. Do not paste untrusted expressions.
+
+Model: https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models
