@@ -1,5 +1,5 @@
 name: XiaoZhi Sherpa-ONNX TTS/STT
-version: "0.4.1"
+version: "0.4.2"
 slug: xiaozhi_sherpa_onnx
 description: Upstream Sherpa-ONNX Wyoming and OpenAI-compatible speech APIs
 url: https://github.com/ptbsare/sherpa-onnx-tts-stt
